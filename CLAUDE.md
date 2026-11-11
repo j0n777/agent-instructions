@@ -70,7 +70,7 @@ Never report a task as done without running its verification.
 
 ## 5. Git and pull requests
 ### 5.1 Source of truth
-- Git (e.g. GitHub) is the source of truth. [ADAPT] Edit code through the repository, never through hosting or no-code platforms (e.g. Lovable, Vercel, Hostinger); they only publish what is in Git.
+- Git (e.g. GitHub) is the source of truth. [ADAPT] Edit code through the repository, never through hosting dashboards or no-code builders; they only publish what is in Git.
 
 ### 5.2 PRs and merging
 - Open the PR. Merge only on my explicit order, or through GitHub's native auto-merge when I have authorized it for that repository (it merges only after checks pass).
