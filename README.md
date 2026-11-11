@@ -27,8 +27,8 @@ See [`EXAMPLES.md`](EXAMPLES.md) for before/after cases.
 | [`CLAUDE.md`](CLAUDE.md) | Claude Code. Put it in your project root or in `~/.claude/CLAUDE.md` for all projects. |
 | [`AGENTS.md`](AGENTS.md) | Codex and other agents that read `AGENTS.md`. Same content as `CLAUDE.md`. |
 | [`EXAMPLES.md`](EXAMPLES.md) | Before/after cases: routing, escalation, briefs, sources, surgical changes, irreversible actions. |
+| [`claude-code/agents/`](claude-code/agents/) | Claude Code subagents pinned to Haiku: `explore.md` and `log-reader.md`. |
 | [`chatgpt/custom-instructions.md`](chatgpt/custom-instructions.md) | ChatGPT: full text for Projects/GPTs, condensed text for Custom Instructions. |
-| [`examples/jonata.md`](examples/jonata.md) | A filled-in personal version (Lovable/Hostinger deploy, Brazilian Portuguese). |
 
 Lines marked `[ADAPT]` are personal preferences: language, deploy platform, model names. Change them; the rest is meant to work as is.
 
@@ -44,7 +44,17 @@ Lines marked `[ADAPT]` are personal preferences: language, deploy platform, mode
 ## Model routing notes
 
 - The tier names are Claude models. On another provider, map each tier to an equivalent model of similar cost and capability.
-- If you cap subagents at a lower tier (for cost), delete the tiers you don't allow and let the main thread handle that work. The author runs with subagents capped at Sonnet locally; the file keeps all four tiers because that's the general case.
+- If you cap subagents at a lower tier (for cost), delete the tiers you don't allow and let the main thread handle that work.
+- The tier uses and the escalation order (verify → raise effort → move up a model) follow Anthropic's guide [Which Claude model should you build with?](https://claude.dev/blog/which-claude-model-should-you-build-with/) (Nov 9, 2026). Model names and prices change; check that post and the [model docs](https://platform.claude.com/docs/en/models/overview) before relying on them.
+
+### Claude Code subagents
+
+[`claude-code/agents/`](claude-code/agents/) has two subagent definitions that pin cheap work to Haiku:
+
+- `explore.md`: overrides the built-in Explore subagent, which (per the guide above) runs on your session's model, not on Haiku.
+- `log-reader.md`: reads test output and logs and reports each failure.
+
+Copy them to `.claude/agents/` (one project) or `~/.claude/agents/` (all projects). `CLAUDE_CODE_SUBAGENT_MODEL` sets the default model for subagents that don't name one.
 - Plain ChatGPT chat doesn't spawn subagents, so the condensed ChatGPT version leaves §8 out.
 
 ## Credits

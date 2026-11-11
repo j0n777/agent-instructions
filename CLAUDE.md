@@ -101,12 +101,12 @@ Never report a task as done without running its verification.
 
 | Tier | Model | Use for |
 |---|---|---|
-| T1 – cheap/fast | `haiku` | Mechanical, fully specified, easily checked work: file/code search, listing, field extraction, reformatting, short translations, summarizing one document, simple lookups, running a known command and reporting output, bulk edits that follow an exact pattern. |
-| T2 – standard | `sonnet` | Most real work: implementing a well-defined feature, writing tests, debugging with a clear repro, web research synthesized across a few sources, drafting content from a clear brief, reviewing a limited diff. |
-| T3 – high reasoning | `opus` | Ambiguous or open problems: architecture, multi-file refactors, hard debugging without a repro, legal/financial/medical analysis, conflicting sources, security-sensitive code, final review of important deliverables. |
-| T4 – frontier | `fable` | Only when T3 failed, or the task is exceptionally hard, novel and high-stakes. Justify the choice in one line. |
+| T1 – cheap/fast | `haiku` | High-volume, cheap-to-verify work: file/code search, reading logs and test output, classification, tagging, field extraction, reformatting, short translations, summarizing one document, running a known command and reporting output, bulk edits that follow an exact pattern. |
+| T2 – standard | `sonnet` | Well-scoped work: a bug fix or feature built against a clear spec, writing tests, debugging with a clear repro, repeated investigation/review/drafting tasks, web research synthesized across a few sources, everyday documents. A clear spec alone isn't enough: migrations and performance work go up a tier. |
+| T3 – high reasoning | `opus` | The default when unsure. Complex coding and knowledge work, multi-file changes, hard debugging without a repro, computer use and vision-heavy work, legal/financial/medical analysis, conflicting sources, security-sensitive code, final review of important deliverables. |
+| T4 – frontier | `fable` | Major refactors, migrations and architecture, leading many subagents, deep research, long unattended runs, or when T3 at `high` effort still falls short. Justify the choice in one line. |
 
-The main thread always keeps planning, decomposition, final synthesis and the answer to me. Those are never delegated.
+The main thread always keeps planning, decomposition, final synthesis and the answer to me. Those are never delegated. Code edits and judgment calls stay on the main model too, unless they are well scoped and checked by tests.
 
 ### 8.2 Routing rules
 1. Decompose first. Split the task into subtasks and route each one separately; a hard task usually contains cheap parts.
@@ -114,7 +114,11 @@ The main thread always keeps planning, decomposition, final synthesis and the an
 3. Move up one tier if any of these apply: judgment between competing options, ambiguous requirements, more than ~3 interdependent files, security/money/legal/production data, output used without further review, or the subagent must decide *what* to do rather than *how*.
 4. Never use T1 for production code logic, legal or financial conclusions, anything irreversible, or final user-facing deliverables.
 5. Run independent subtasks in parallel and dependent ones in sequence. (Git write actions stay serial; see §5.3.)
-6. Don't spawn a subagent for something you can do in one or two direct tool calls.
+6. Don't spawn a subagent for something you can do in one or two direct tool calls. Skip orchestration for a single dependent chain or work that fits in one context window: planning and merging cost more than they save.
+7. Effort before model. When output isn't good enough: first give the model a way to verify its work (test, build, a script that calls the endpoint), then raise effort one level, and only then move up a tier, starting the bigger model at a lower effort than the smaller one used.
+8. Keep the main thread's context lean. Send verbose reading (logs, large files, broad searches) to cheaper subagents and take back summaries; a big context is re-sent and billed every turn.
+9. Don't switch the main model mid-session without a reason. The prompt cache belongs to the model that wrote it, so the first turn on a new model pays for the whole conversation again. If you must switch, compact first or start fresh from a short written plan.
+10. Use T1 only where a mistake is cheap to spot. A misread search result sends the main thread to the wrong file and costs more than it saved.
 
 ### 8.3 Briefing template (every subagent call)
 Subagents have no context from this conversation. Every brief must contain:
@@ -137,12 +141,17 @@ After each subagent returns:
 4. Decide:
    - Pass → integrate.
    - Fixable gap → send a correction brief to the SAME subagent (keeping its context), naming exactly what is wrong.
-   - Second failure on the same subtask → move up one tier with a revised brief (per §3, never retry the same approach a third time).
+   - Second failure on the same subtask → follow §8.2 rule 7 (add verification, raise effort, then move up one tier) with a revised brief (per §3, never retry the same approach a third time).
    - Still failing at T3 → do it in the main thread or ask me.
 5. For high-stakes deliverables, the final check is done by a separate T3 reviewer that did not produce the work.
 
 ### 8.5 Reporting
 At the end, in one or two lines: which subtasks were delegated, to which tier, and any escalations. No step-by-step narration.
+
+### 8.6 Measure before changing the routing
+- Judge by cost per finished task, not price per token: a pricier model that finishes in fewer tokens can be cheaper.
+- To compare, run the same real task on two models (or two effort levels), each in its own session, and compare cost and result. Keep a multi-model setup only if it beats every single model.
+- Price the hardest tasks, not the typical ones: a few hard tasks often carry most of the spend.
 
 ## 9. Success criteria
 This file is working if: diffs contain fewer unnecessary changes, there are fewer rewrites, clarifying questions come before implementation, every factual claim has a source, no irreversible action happens without my OK, and subagent costs drop without more rework.

@@ -34,9 +34,17 @@ The search is the cheapest part of the job, so it goes to the cheapest model. Pl
 
 **Without:** "let me try once more" with the same approach, then once more.
 
-**With:** after the second failure on the same subtask, the main thread writes a *revised* brief (what was tried, why it failed, what's different now) and sends it one tier up. If T3 also fails, the main thread does it or asks the user.
+**With:** after the second failure on the same subtask, the main thread writes a *revised* brief (what was tried, why it failed, what's different now) and escalates in order: first give the subagent a way to check itself (run the test 20 times in a loop), then raise effort one level, and only then move up a tier, starting the bigger model at a lower effort. If T3 also fails, the main thread does it or asks the user.
 
-### 4. Don't spawn a subagent for two tool calls
+### 4. Keep the expensive context lean
+
+> **Request:** "The integration suite failed. Why?"
+
+**Without:** the main thread reads 4,000 lines of test output into its own context, and pays for them again on every later turn.
+
+**With:** a T1 `log-reader` subagent reads the output and returns three lines: file, test name, first error line. The main thread opens only the failing file.
+
+### 5. Don't spawn a subagent for two tool calls
 
 > **Request:** "What port does the dev server use?"
 
@@ -44,7 +52,7 @@ The search is the cheapest part of the job, so it goes to the cheapest model. Pl
 
 **With:** the main thread opens `package.json` or the config file and answers. Briefing a subagent costs more than the lookup.
 
-### 5. A brief that a subagent can act on
+### 6. A brief that a subagent can act on
 
 **Without:**
 ```
