@@ -2,12 +2,31 @@
 
 A standing instruction file for AI coding agents (Claude Code, ChatGPT/Codex and others): how to answer, how to source facts, how to change code, what never to do without asking, and **how to route subagent work to the cheapest model that does it well**.
 
+## Install
+
+In your project root (macOS/Linux/Git Bash):
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/j0n777/agent-instructions/main/CLAUDE.md >> CLAUDE.md
+```
+
+Windows PowerShell:
+
+```powershell
+(Invoke-WebRequest -UseBasicParsing https://raw.githubusercontent.com/j0n777/agent-instructions/main/CLAUDE.md).Content | Add-Content -Encoding utf8 CLAUDE.md
+```
+
+Both **append**, so an existing `CLAUDE.md` keeps its content; review the result and remove anything that conflicts. For all projects, run it inside `~/.claude/` instead. For Codex, swap `CLAUDE.md` for `AGENTS.md` in both places.
+
+See [`EXAMPLES.md`](EXAMPLES.md) for before/after cases.
+
 ## Files
 
 | File | For |
 |---|---|
 | [`CLAUDE.md`](CLAUDE.md) | Claude Code. Put it in your project root or in `~/.claude/CLAUDE.md` for all projects. |
 | [`AGENTS.md`](AGENTS.md) | Codex and other agents that read `AGENTS.md`. Same content as `CLAUDE.md`. |
+| [`EXAMPLES.md`](EXAMPLES.md) | Before/after cases: routing, escalation, briefs, sources, surgical changes, irreversible actions. |
 | [`chatgpt/custom-instructions.md`](chatgpt/custom-instructions.md) | ChatGPT: full text for Projects/GPTs, condensed text for Custom Instructions. |
 | [`examples/jonata.md`](examples/jonata.md) | A filled-in personal version (Lovable/Hostinger deploy, Brazilian Portuguese). |
 
